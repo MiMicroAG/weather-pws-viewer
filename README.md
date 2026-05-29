@@ -160,6 +160,6 @@ MIT (LICENSE 参照)
 4. Codex CLI でコード監査 (Critical 1 件 + Warning 10 件 + Suggestion 5 件を検出)
 5. 検出された全項目を再度ヘッドレス Claude Code に修正委譲
 
-詳しい経緯は [note 記事](https://note.com/) (リンクは公開後に追記) に書きました。
+詳しい経緯は [note 記事]([https://note.com](https://note.com/kurigohanx/n/n087f020ace5e?app_launch=false)/) (リンクは公開後に追記) に書きました。
 
 Issue / PR 歓迎します。
