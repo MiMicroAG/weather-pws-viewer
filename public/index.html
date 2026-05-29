@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0b1a3d">
+  <title>ウェザー</title>
+  <link rel="apple-touch-icon" href="./icons/icon-180.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="pages" id="pages">
+
+  <!-- Page 1: Current + Temp/Dewpt Chart -->
+  <div class="page" id="page1">
+    <div class="header">
+      <div class="station-label" id="stationLabel">--</div>
+      <div class="station-location" id="stationLocation">--</div>
+      <div class="obs-time" id="obsTime">--</div>
+      <div class="station-id" id="stationIdDisplay">--</div>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="cards" id="cardsGrid">
+      <div class="card" id="cardTemp">
+        <div class="card-label">気温</div>
+        <div class="card-value"><span id="valTemp">--</span><span class="card-unit"> °C</span></div>
+        <div class="card-minmax" id="mmTemp"></div>
+      </div>
+      <div class="card" id="cardDewpt">
+        <div class="card-label">露点</div>
+        <div class="card-value"><span id="valDewpt">--</span><span class="card-unit"> °C</span></div>
+        <div class="card-minmax" id="mmDewpt"></div>
+      </div>
+      <div class="card" id="cardHumidity">
+        <div class="card-label">湿度</div>
+        <div class="card-value"><span id="valHumidity">--</span><span class="card-unit"> %</span></div>
+        <div class="card-minmax" id="mmHumidity"></div>
+      </div>
+      <div class="card" id="cardPressure">
+        <div class="card-label">気圧</div>
+        <div class="card-value"><span id="valPressure">--</span><span class="card-unit"> hPa</span></div>
+        <div class="card-minmax" id="mmPressure"></div>
+      </div>
+      <div class="card" id="cardWind">
+        <div class="card-label">風速</div>
+        <div class="card-value"><span id="valWind">--</span><span class="card-unit"> m/s</span> <span class="wind-pip" id="windPip"></span></div>
+        <div class="card-sub" id="windDirText"></div>
+        <div class="card-minmax" id="mmWind"></div>
+      </div>
+      <div class="card" id="cardGust">
+        <div class="card-label">突風</div>
+        <div class="card-value"><span id="valGust">--</span><span class="card-unit"> m/s</span></div>
+        <div class="card-minmax" id="mmGust"></div>
+      </div>
+      <div class="card" id="cardRain">
+        <div class="card-label">雨量</div>
+        <div class="card-value"><span id="valRain">--</span><span class="card-unit"> mm</span></div>
+        <div class="card-sub" id="rainRate"></div>
+        <div class="card-minmax" id="mmRain"></div>
+      </div>
+      <div class="card" id="cardSolar">
+        <div class="card-label">日射 / UV</div>
+        <div class="card-value"><span id="valSolar">--</span><span class="card-unit"> W/m²</span></div>
+        <div class="card-sub" id="uvIndex"></div>
+        <div class="card-minmax" id="mmSolar"></div>
+      </div>
+    </div>
+
+    <div class="period-selector" id="periodSelector"></div>
+    <div class="partial-banner" id="partialBanner">一部の日のデータが取得できませんでした</div>
+
+    <div class="chart-container" id="chartTempContainer">
+      <div class="chart-title">気温 / 露点 (°C)</div>
+      <canvas id="chartTemp"></canvas>
+      <div class="chart-loading" id="loadingTemp" style="display:none"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- Page 2: Detail Charts -->
+  <div class="page" id="page2">
+    <div class="page-title">詳細チャート</div>
+    <div class="period-selector" id="periodSelector2"></div>
+    <div class="partial-banner" id="partialBanner2">一部の日のデータが取得できませんでした</div>
+
+    <div class="chart-container" id="chartPressureContainer">
+      <div class="chart-title">気圧 (hPa)</div>
+      <canvas id="chartPressure"></canvas>
+      <div class="chart-loading" id="loadingPressure" style="display:none"><div class="spinner"></div></div>
+    </div>
+    <div class="chart-container" id="chartHumidityContainer">
+      <div class="chart-title">湿度 (%)</div>
+      <canvas id="chartHumidity"></canvas>
+      <div class="chart-loading" id="loadingHumidity" style="display:none"><div class="spinner"></div></div>
+    </div>
+    <div class="chart-container" id="chartWindContainer">
+      <div class="chart-title">風速 / 突風 (m/s)</div>
+      <canvas id="chartWind"></canvas>
+      <div class="chart-loading" id="loadingWind" style="display:none"><div class="spinner"></div></div>
+    </div>
+    <div class="chart-container" id="chartWindDirContainer">
+      <div class="chart-title">風向 (°)</div>
+      <canvas id="chartWindDir"></canvas>
+      <div class="chart-loading" id="loadingWindDir" style="display:none"><div class="spinner"></div></div>
+    </div>
+    <div class="chart-container" id="chartRainContainer">
+      <div class="chart-title">雨量 (mm)</div>
+      <canvas id="chartRain"></canvas>
+      <div class="chart-loading" id="loadingRain" style="display:none"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- Page 3: Settings -->
+  <div class="page" id="page3">
+    <div class="page-title">設定</div>
+    <div class="settings-section">
+      <h3>ステーション</h3>
+      <label for="stationSelect">ステーション選択</label>
+      <select id="stationSelect"></select>
+    </div>
+    <div class="settings-section">
+      <h3>自動更新</h3>
+      <label for="intervalSelect">更新間隔</label>
+      <select id="intervalSelect">
+        <option value="30">30 秒</option>
+        <option value="60" selected>60 秒</option>
+        <option value="120">2 分</option>
+        <option value="300">5 分</option>
+        <option value="0">オフ</option>
+      </select>
+    </div>
+    <div class="settings-section">
+      <h3>文字サイズ</h3>
+      <div class="font-scale-selector" id="fontScaleSelector">
+        <button class="pill" data-scale="0.85">小</button>
+        <button class="pill active" data-scale="1">中</button>
+        <button class="pill" data-scale="1.2">大</button>
+        <button class="pill" data-scale="1.45">特大</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <button class="btn" id="btnReload">今すぐ更新</button>
+      <div class="last-updated" id="lastUpdated">最終取得: --</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Page dots -->
+<div class="page-dots" id="pageDots">
+  <div class="dot active"></div>
+  <div class="dot"></div>
+  <div class="dot"></div>
+</div>
+
+<!-- Custom date modal -->
+<div class="modal-overlay" id="dateModal">
+  <div class="modal">
+    <h3>期間指定</h3>
+    <label for="customEndDate">終了日</label>
+    <input type="date" id="customEndDate">
+    <label for="customRange">期間</label>
+    <select id="customRange">
+      <option value="24h">24 時間</option>
+      <option value="1d">1 日</option>
+      <option value="1w" selected>1 週間</option>
+      <option value="2w">2 週間</option>
+      <option value="1mo">1 か月</option>
+      <option value="6mo">半年</option>
+      <option value="1y">1 年</option>
+    </select>
+    <div class="modal-buttons">
+      <button class="btn btn-cancel" id="btnDateCancel">取消</button>
+      <button class="btn" id="btnDateApply">適用</button>
+    </div>
+  </div>
+</div>
+
+<script src="./vendor/chart.umd.min.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
